@@ -1,9 +1,31 @@
 import Head from "next/head";
-import Image from "next/image";
-import styles from "../styles/Home.module.css";
+
 import "../flow/config";
+import { useState, useEffect } from "react";
+import * as fcl from "@onflow/fcl";
 
 export default function Home() {
+  const [user, setUser] = useState({ loggedIn: null });
+
+  useEffect(() => fcl.currentUser.subscribe(setUser), []);
+
+  const AuthedState = () => {
+    return (
+      <div>
+        <div>Address: {user?.addr ?? "No Address"}</div>
+        <button onClick={fcl.unauthenticate}>Log Out</button>
+      </div>
+    );
+  };
+
+  const UnauthenticatedState = () => {
+    return (
+      <div>
+        <button onClick={fcl.logIn}>Log In</button>
+        <button onClick={fcl.signUp}>Sign Up</button>
+      </div>
+    );
+  };
   return (
     <div>
       <Head>
@@ -12,7 +34,10 @@ export default function Home() {
         <link rel="icon" href="/favicon.png" />
       </Head>
 
-      <main>Hello World! I am Leo</main>
+      <main>
+        <h2>Hello World! I am Leo</h2>
+        {user.loggedIn ? <AuthedState /> : <UnauthenticatedState />}
+      </main>
     </div>
   );
 }
